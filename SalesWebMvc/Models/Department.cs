@@ -10,7 +10,9 @@ namespace SalesWebMvc.Models
         public string Name { get; set; }
         public ICollection<Seller> Sellers { get; set; } = new List<Seller>();
 
-        public Department() { }
+        public Department() 
+        { 
+        }
 
         public Department(int id, string name)
         {
@@ -21,11 +23,6 @@ namespace SalesWebMvc.Models
         public void AddSeller(Seller seller)
         {
             Sellers.Add(seller);
-        }
-        
-        public void RemoverSeller(Seller seller)
-        {
-            Sellers.Remove(seller);
         }
 
         public double TotalSales(DateTime initial, DateTime final)
