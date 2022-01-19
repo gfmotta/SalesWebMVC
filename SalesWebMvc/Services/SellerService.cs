@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SalesWebMvc.Data;
 using SalesWebMvc.Models;
+using SalesWebMvc.Services.Exceptions;
 
 namespace SalesWebMvc.Services
 {
@@ -39,5 +40,26 @@ namespace SalesWebMvc.Services
             _context.Seller.Remove(seller);
             _context.SaveChanges();
         }
+
+        public void Update(Seller obj)
+        {
+            // Para atualizar um registro é necessario verifcar se existe esse vendedor no banco de dados
+            if (!_context.Seller.Any(seller => seller.Id == obj.Id))
+            {
+                throw new NotFoundException("Seller not found!");
+            }
+
+            try
+            {
+                _context.Update(obj);
+                _context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException e)
+            {
+                throw new DbConcurrencyException(e.Message); // Lança uma exceçao da camada de serviço respeitando assim o padrão da arquitetura(MVC)
+            }
+        }
+
+
     }
 }
