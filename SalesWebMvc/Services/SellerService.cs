@@ -36,9 +36,16 @@ namespace SalesWebMvc.Services
 
         public async Task RemoveAsync(int id)
         {
-            var seller = await _context.Seller.FindAsync(id);
-            _context.Seller.Remove(seller);
-            await _context.SaveChangesAsync();
+            try
+            {
+                var seller = await _context.Seller.FindAsync(id);
+                _context.Seller.Remove(seller);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                throw new IntegrityException("Cannot delete a seller that has sales registered");
+            }
         }
 
         public async Task UpdateAsync(Seller obj)
@@ -47,7 +54,7 @@ namespace SalesWebMvc.Services
             bool hasAny = await _context.Seller.AnyAsync(seller => seller.Id == obj.Id);
             if (!hasAny)
             {
-                throw new NotFoundException("Seller not found!");
+                throw new NotFoundException("Seller not found");
             }
 
             try
@@ -60,7 +67,5 @@ namespace SalesWebMvc.Services
                 throw new DbConcurrencyException(e.Message); // Lança uma exceçao da camada de serviço respeitando assim o padrão da arquitetura(MVC)
             }
         }
-
-
     }
 }
